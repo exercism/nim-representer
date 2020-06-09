@@ -101,7 +101,7 @@ proc normalizeStmtList(code: NimNode, map: var Table[string,
   normalizedTree
 
 const tslug = "hello_world.nim"
-const tinputDir = "/Users/ynf/Exercism/nim/hello-world/"
+const tinputDir = "~/Exercism/nim/hello-world/"
 const path = tinputDir & tslug
 var map {.compileTime.} = initTable[string, string](16)
 let code {.compileTime.} = parseStmt path.staticRead
