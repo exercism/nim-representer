@@ -1,18 +1,21 @@
 # Create an normalized AST of a submission on exercism.io to provide feedback
 import macros, strformat, sequtils, strutils, tables
+import representer/mapping
 when isMainModule:
   import json
 
-proc normalizeStmtList*(code: NimNode, map: var OrderedTable[string, string]): NimNode
-proc normalizeValue(value: NimNode, map: var OrderedTable[string, string]): NimNode
+export IdentMap
 
-proc getNormalization(node: NimNode, map: var OrderedTable[string, string]): NimNode =
+proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode
+proc normalizeValue(value: NimNode, map: var IdentMap): NimNode
+
+proc getNormalization(node: NimNode, map: var IdentMap): NimNode =
   map.getOrDefault(node.strVal, node.strVal).ident
 
-proc normalizeDefName(identDef: NimNode, map: var OrderedTable[string, string]): NimNode =
+proc normalizeDefName(identDef: NimNode, map: var IdentMap): NimNode =
   map.mgetOrPut(identDef.strVal, fmt"placeholder_{map.len}").ident
 
-proc addNewName(node: NimNode, map: var OrderedTable[string, string]): NimNode =
+proc addNewName(node: NimNode, map: var IdentMap): NimNode =
   case node.kind:
   of nnkPostfix:
     node.unpackPostfix[0].normalizeDefName(map).postfix("*")
@@ -21,7 +24,7 @@ proc addNewName(node: NimNode, map: var OrderedTable[string, string]): NimNode =
   else:
     node.normalizeDefName(map)
 
-proc normalizeCall(call: NimNode, map: var OrderedTable[string, string]): NimNode =
+proc normalizeCall(call: NimNode, map: var IdentMap): NimNode =
   result = newCall(
     call[0].getNormalization(map),
   )
@@ -31,22 +34,21 @@ proc normalizeCall(call: NimNode, map: var OrderedTable[string, string]): NimNod
         param[1].normalizeValue(map)
       else:
         param.normalizeValue(map)
-        
 
-
-proc normalizeValue(value: NimNode, map: var OrderedTable[string, string]): NimNode =
+proc normalizeValue(value: NimNode, map: var IdentMap): NimNode =
   case value.kind:
   of nnkLiterals: value
   of nnkIdent: value.normalizeDefName(map)
   of nnkCallKinds: value.normalizeCall(map)
   of nnkEmpty: value
   of nnkStmtList: value.normalizeStmtList(map) # for macros and templates
+  of nnkDotExpr: newDotExpr(value[0], value[1])
   else:
     raise newException(ValueError, "dont know how to normalize type: " &
         $value.kind & " as a value")
 
 
-proc normalizeIdentDef(def: NimNode, map: var OrderedTable[string, string]): NimNode =
+proc normalizeIdentDef(def: NimNode, map: var IdentMap): NimNode =
   var (name, defType, default) = (def[0], def[1], def[2])
   # TODO: multiple identifiers
   name = name.normalizeDefName(map)
@@ -54,14 +56,13 @@ proc normalizeIdentDef(def: NimNode, map: var OrderedTable[string, string]): Nim
   if defType.kind != nnkEmpty:
     defType = defType.getNormalization(map)
 
-  if default.kind notin  nnkLiterals:
+  if default.kind notin nnkLiterals:
     default = default.normalizeValue(map)
-  # TODO: deal with complex types (distinct, obj, tuples)
   # TODO: generic parameters
   newIdentDefs(name, defType, default)
 
-proc normalizeRoutineDef(routineDef: NimNode, map: var OrderedTable[string, string]): NimNode =
-  ## RoutingDef Tree:
+proc normalizeRoutineDef(routineDef: NimNode, map: var IdentMap): NimNode =
+  ## RoutineDef Tree:
     ##    Ident | Postfix(*, Ident) # proc name
     ##    Empty # Related to Term rewriting macros which are not supported
     ##    Empty | GenericParams
@@ -85,23 +86,23 @@ proc normalizeRoutineDef(routineDef: NimNode, map: var OrderedTable[string, stri
     newEmptyNode(), # Term Rewriting macros and templates which are not supported
     newEmptyNode(), # TODO: Implement Generic Params
     nnkFormalParams.newTree(
-      returnType.getNormalization(map)
+      returnType.normalizeValue(map)
     ).add(identDefs),
     newEmptyNode(), # TODO: Implement pargma
     newEmptyNode(), # Empty, open for future use
     routineDef.last.normalizeStmtList(map)
   )
 
-proc normalizeStmtList*(code: NimNode, map: var OrderedTable[string, string]): NimNode =
+proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
   code.expectKind nnkStmtList
   var normalizedTree = nnkStmtList.newTree
-  for index, statement in code:
+
+  for statement in code:
     normalizedTree.add case statement.kind:
     of nnkCommentStmt: continue
     of nnkVarSection..nnkConstSection:
       var newDefSection = statement.kind.newTree()
       for def in statement:
-
         newDefSection.add def.normalizeIdentDef(map)
       newDefSection
     of nnkTypeSection: # TODO: Implement type normalizaation
@@ -112,10 +113,11 @@ proc normalizeStmtList*(code: NimNode, map: var OrderedTable[string, string]): N
       statement.normalizeCall(map)
     else:
       statement
+
   normalizedTree
 
-proc createRepresentation*(fileName: string): (NimNode, OrderedTable[string, string]) =
-  var map = initOrderedTable[string, string](16)
+proc createRepresentation*(fileName: string): (NimNode, IdentMap) =
+  var map: IdentMap
   let code = parseStmt fileName.staticRead
   (code.normalizeStmtList(map), map)
 
