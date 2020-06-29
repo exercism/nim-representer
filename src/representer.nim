@@ -121,12 +121,8 @@ proc createRepresentation*(fileName: string): (NimNode, IdentMap) =
   let code = parseStmt fileName.staticRead
   (code.normalizeStmtList(map), map)
 
-when defined(server):
+when isMainModule:
+  const path {.strdefine.} = "../../Exercism/nim/two-fer/two_fer.nim"
   static:
-    let (tree, map)  = createRepresentation "../../representation-web-viewer/public/code.nim"
-    echo (%*{"map": map, "tree":tree.repr}).pretty
-else:
-  when isMainModule:
-    static:
-      let (tree, map) = createRepresentation "../../Exercism/nim/hello-world/hello_world.nim"
-      echo tree.repr, '\n', '\n', (%*map).pretty
+    let (tree, map) = createRepresentation path
+    echo (%*{"map": map, "tree" : tree.repr}).pretty
