@@ -1,5 +1,5 @@
-# Create an normalized AST of a submission on exercism.io to provide feedback
-import macros, strformat, sequtils, strutils, tables
+## Create an normalized AST of a submission on exercism.io to provide feedback
+import algorithm, macros, strformat, sequtils, strutils, tables
 import representer/mapping
 when isMainModule:
   import json
@@ -93,6 +93,15 @@ proc normalizeRoutineDef(routineDef: NimNode, map: var IdentMap): NimNode =
     routineDef.last.normalizeStmtList(map)
   )
 
+proc normalizeImportExport(importStmt: NimNode, map: IdentMap): NimNode =
+  case importStmt.kind:
+  of nnkImportExceptStmt, nnkFromStmt, nnkExportExceptStmt:
+    importStmt.kind.newTree(importStmt[0]).add importStmt[1..^1].sortedByIt(it.strVal)
+  of nnkImportStmt, nnkExportStmt:
+    importStmt.kind.newTree(importStmt[0..^1].sortedByIt(if it.kind == nnkInfix: it.unpackInfix.left.strVal else: it.strVal)) #TODO: implemement normalizations of `import macros as m`
+  else:
+    raise newException(ValueError, $importStmt & "is not a valid import stmt")
+
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
   code.expectKind nnkStmtList
   var normalizedTree = nnkStmtList.newTree
@@ -111,6 +120,10 @@ proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
       statement.normalizeRoutineDef(map)
     of nnkCallKinds: # TODO: nnkDotExprs? nnkCallStrLit?
       statement.normalizeCall(map)
+    of nnkImportStmt, nnkFromStmt, nnkImportExceptStmt:
+      statement.normalizeImportExport(map)
+    of nnkDiscardStmt:
+      nnkDiscardStmt.newNimNode.add statement[0].normalizeValue(map)
     else:
       statement
 
