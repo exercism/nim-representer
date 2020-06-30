@@ -4,7 +4,7 @@ type
   NormalizedIdent = string
   IdentMap* = OrderedTable[NormalizedIdent, string]
 
-proc hash(x: NormalizedIdent): Hash =
+proc hash(x: NormalizedIdent): Hash {.used.} =
   !$(x[0].hash !& x[1..^1].hashIgnoreStyle)
 
 proc `==`(a, b: NormalizedIdent): bool =
