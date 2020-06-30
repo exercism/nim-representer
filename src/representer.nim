@@ -63,21 +63,21 @@ proc normalizeIdentDef(def: NimNode, map: var IdentMap): NimNode =
 
 proc normalizeRoutineDef(routineDef: NimNode, map: var IdentMap): NimNode =
   ## RoutineDef Tree:
-    ##    Ident | Postfix(*, Ident) # proc name
-    ##    Empty # Related to Term rewriting macros which are not supported
-    ##    Empty | GenericParams
-    ##      IdentDefs
-    ##        Ident
-    ##        Type
-    ##    FormalParams
-    ##      empty | returntype
-    ##      @[IdentDefs]
-    ##        idents | @[ident, ident]
-    ##        ident -> type
-    ##        empty | default
-    ##    Pragmas
-    ##    Empty
-    ##    StmtList # meat and potatoes
+  ##   Ident | Postfix(\*, Ident) (proc name)
+  ##   Empty # Related to Term rewriting macros which are not supported
+  ##   Empty | GenericParams
+  ##     IdentDefs
+  ##       Ident
+  ##       Type
+  ##   FormalParams
+  ##     empty | returntype
+  ##     @[IdentDefs] =
+  ##       idents | @[ident, ident]
+  ##       ident -> type
+  ##       empty | default
+  ##   Pragmas
+  ##   Empty
+  ##   StmtList # meat and potatoes
   let formalParams = routineDef[3]
   let returnType = formalParams[0]
   let identDefs = formalParams[1..^1].mapIt(it.normalizeIdentDef(map))
@@ -97,7 +97,7 @@ proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
   code.expectKind nnkStmtList
   var normalizedTree = nnkStmtList.newTree
 
-  for statement in code:
+  for index, statement in code:
     normalizedTree.add case statement.kind:
     of nnkCommentStmt: continue
     of nnkVarSection..nnkConstSection:
@@ -122,7 +122,9 @@ proc createRepresentation*(fileName: string): (NimNode, IdentMap) =
   (code.normalizeStmtList(map), map)
 
 when isMainModule:
-  const path {.strdefine.} = "../../Exercism/nim/two-fer/two_fer.nim"
   static:
+    const path {.strdefine.} = "../../Exercism/nim/two-fer/two_fer.nim" ##\
+    ## The path to the file to create representation for
+    ## Can be invoked with -d:path=<PATH-TO-FILE>
     let (tree, map) = createRepresentation path
     echo (%*{"map": map, "tree" : tree.repr}).pretty
