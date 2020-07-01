@@ -41,7 +41,7 @@ proc normalizeValue(value: NimNode, map: var IdentMap): NimNode =
   of nnkIdent: value.normalizeDefName(map)
   of nnkCallKinds: value.normalizeCall(map)
   of nnkEmpty: value
-  of nnkStmtList: value.normalizeStmtList(map) # for macros and templates
+  of nnkStmtList: value.normalizeStmtList(map)
   of nnkDotExpr: newDotExpr(value[0], value[1])
   else:
     raise newException(ValueError, "dont know how to normalize type: " &
@@ -88,7 +88,7 @@ proc normalizeRoutineDef(routineDef: NimNode, map: var IdentMap): NimNode =
     nnkFormalParams.newTree(
       returnType.normalizeValue(map)
     ).add(identDefs),
-    newEmptyNode(), # TODO: Implement pargma
+    newEmptyNode(), # TODO: Implement pragma
     newEmptyNode(), # Empty, open for future use
     routineDef.last.normalizeStmtList(map)
   )
@@ -98,7 +98,7 @@ proc normalizeImportExport(importStmt: NimNode, map: IdentMap): NimNode =
   of nnkImportExceptStmt, nnkFromStmt, nnkExportExceptStmt:
     importStmt.kind.newTree(importStmt[0]).add importStmt[1..^1].sortedByIt(it.strVal)
   of nnkImportStmt, nnkExportStmt:
-    importStmt.kind.newTree(importStmt[0..^1].sortedByIt(if it.kind == nnkInfix: it.unpackInfix.left.strVal else: it.strVal)) #TODO: implemement normalizations of `import macros as m`
+    importStmt.kind.newTree(importStmt[0..^1].sortedByIt(if it.kind == nnkInfix: it.unpackInfix.left.strVal else: it.strVal)) # TODO: implemement normalizations of `import macros as m`
   else:
     raise newException(ValueError, $importStmt & "is not a valid import stmt")
 
