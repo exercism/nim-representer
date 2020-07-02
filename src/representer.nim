@@ -41,6 +41,7 @@ proc normalizeValue(value: NimNode, map: var IdentMap): NimNode =
   of nnkEmpty: value
   of nnkStmtList: value.normalizeStmtList(map)
   of nnkDotExpr: newDotExpr(value[0].normalizeValue(map), value[1].normalizeValue(map))
+  of nnkPar: value[0].normalizeValue(map)
   else:
     raise newException(ValueError, "dont know how to normalize type: " &
         $value.kind & " as a value")
