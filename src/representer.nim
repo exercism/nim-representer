@@ -38,7 +38,7 @@ proc normalizeCall(call: NimNode, map: var IdentMap): NimNode =
 proc normalizeValue(value: NimNode, map: var IdentMap): NimNode =
   case value.kind:
   of nnkLiterals: value
-  of nnkIdent: value.normalizeDefName(map)
+  of nnkIdent: value.getNormalization(map)
   of nnkCallKinds: value.normalizeCall(map)
   of nnkEmpty: value
   of nnkStmtList: value.normalizeStmtList(map)
