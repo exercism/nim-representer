@@ -116,7 +116,7 @@ proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
       statement
     of RoutineNodes - {nnkLambda, nnkDo}: # We aren't supporting `do:` as of yet
       statement.normalizeRoutineDef(map)
-    of nnkCallKinds: # TODO: nnkDotExprs? nnkCallStrLit?
+    of nnkCallKinds:
       statement.normalizeCall(map)
     of nnkImportStmt, nnkFromStmt, nnkImportExceptStmt:
       statement.normalizeImportExport(map)
