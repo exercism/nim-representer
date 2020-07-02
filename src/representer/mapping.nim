@@ -29,8 +29,6 @@ when isMainModule:
     setup
     map["x"] = "placeholder_0"
     map["X"] = "placeholder_1"
-    echo map
-    echo map.len
     doAssert map.len == 2
 
   block otherLetterCapitals:
@@ -39,6 +37,4 @@ when isMainModule:
     map["hElLO"] = "placeholder_100"
     map["Hello"] = "placeholder_2"
     map["HELLo"] = "placeholder_200"
-    echo map
-    echo map.len
     doAssert map.len == 2
