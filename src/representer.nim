@@ -26,7 +26,7 @@ proc addNewName(node: NimNode, map: var IdentMap): NimNode =
 
 proc normalizeCall(call: NimNode, map: var IdentMap): NimNode =
   result = newCall(
-    call[0].getNormalization(map),
+    call[0].normalizeValue(map),
   )
   for param in call[1..^1]:
     result.add case param.kind:
