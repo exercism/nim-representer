@@ -8,8 +8,7 @@ proc hash(x: NormalizedIdent): Hash {.used.} =
   !$(x[0].hash !& x[1..^1].hashIgnoreStyle)
 
 proc `==`(a, b: NormalizedIdent): bool =
-  a[0] == b[0] and
-    a.replace("_", "").toLowerAscii == b.replace("_", "").toLowerAscii
+  a[0] == b[0] and cmpIgnoreStyle(a, b) == 0
 
 
 when isMainModule:
