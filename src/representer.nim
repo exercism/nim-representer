@@ -100,7 +100,7 @@ proc normalizeImportExport(importStmt: NimNode, map: IdentMap): NimNode =
   of nnkImportStmt, nnkExportStmt:
     importStmt.kind.newTree(importStmt[0..^1].sortedByIt(if it.kind == nnkInfix: it.unpackInfix.left.strVal else: it.strVal)) # TODO: implemement normalizations of `import macros as m`
   else:
-    raise newException(ValueError, $importStmt & "is not a valid import stmt")
+    raise newException(ValueError, $importStmt & "is not a valid import or export stmt")
 
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
   code.expectKind nnkStmtList
