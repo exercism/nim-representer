@@ -24,7 +24,6 @@ when isMainModule:
     map["x"] = "placeholder_1"
     map["y"] = "placeholder_2"
     doAssert map.len == 2
-  
   block firstLetterCapital:
     setup
     map["x"] = "placeholder_0"

@@ -140,4 +140,4 @@ when isMainModule:
     ## The path to the file to create representation for
     ## Can be invoked with -d:path=<PATH-TO-FILE>
     let (tree, map) = createRepresentation path
-    echo (%*{"map": map, "tree" : tree.repr}).pretty
+    echo (%*{"map": map, "tree": tree.repr}).pretty
