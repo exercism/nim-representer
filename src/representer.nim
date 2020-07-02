@@ -1,7 +1,8 @@
 ## Create an normalized AST of a submission on exercism.io to provide feedback
-import algorithm, macros, strformat, sequtils, strutils, tables
+import algorithm, macros, strformat, sequtils, strutils
 import representer/mapping
-export IdentMap
+
+export mapping
 
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode
 proc normalizeValue(value: NimNode, map: var IdentMap): NimNode

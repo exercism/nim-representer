@@ -1,4 +1,5 @@
 import hashes, tables, strutils
+export tables
 
 type
   NormalizedIdent = string
