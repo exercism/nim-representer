@@ -1,9 +1,6 @@
 ## Create an normalized AST of a submission on exercism.io to provide feedback
 import algorithm, macros, strformat, sequtils, strutils, tables
 import representer/mapping
-when isMainModule:
-  import json
-
 export IdentMap
 
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode
@@ -135,6 +132,7 @@ proc createRepresentation*(fileName: string): (NimNode, IdentMap) =
   (code.normalizeStmtList(map), map)
 
 when isMainModule:
+  import json
   static:
     const path {.strdefine.} = "../../Exercism/nim/two-fer/two_fer.nim" ##\
     ## The path to the file to create representation for
