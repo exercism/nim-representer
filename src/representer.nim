@@ -8,10 +8,10 @@ proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode
 proc normalizeValue(value: NimNode, map: var IdentMap): NimNode
 
 proc getNormalization(node: NimNode, map: var IdentMap): NimNode =
-  map.getOrDefault(node.strVal, node.strVal).ident
+  map.getOrDefault(node.strVal.NormalizedIdent, node.strVal).ident
 
 proc normalizeDefName(identDef: NimNode, map: var IdentMap): NimNode =
-  map.mgetOrPut(identDef.strVal, fmt"placeholder_{map.len}").ident
+  map.mgetOrPut(identDef.strVal.NormalizedIdent, fmt"placeholder_{map.len}").ident
 
 proc addNewName(node: NimNode, map: var IdentMap): NimNode =
   case node.kind:
