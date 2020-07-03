@@ -29,7 +29,7 @@ proc normalizeCall(call: NimNode, map: var IdentMap): NimNode =
   for param in call[1..^1]:
     result.add case param.kind:
       of nnkExprEqExpr:
-        param[1].normalizeValue(map)
+        nnkExprEqExpr.newTree(param[0].normalizeValue(map), param[1].normalizeValue(map))
       else:
         param.normalizeValue(map)
 
