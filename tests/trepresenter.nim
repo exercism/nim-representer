@@ -90,7 +90,9 @@ let
 proc placeholder_4*(placeholder_2: int; placeholder_3: string): string =
   let placeholder_5 = `-`(placeholder_2, placeholder_0)
   let placeholder_6 = `&`(placeholder_1, placeholder_3)
-  `&`(`$`(placeholder_5), placeholder_6)"""
+  `&`(`$`(placeholder_5), placeholder_6)
+
+placeholder_4(placeholder_2 = 1, placeholder_3 = "how old am I?")"""
     setup(tree.strip == expected.strip):
       import strutils, algorithm, macros as m
 
@@ -102,3 +104,5 @@ proc placeholder_4*(placeholder_2: int; placeholder_3: string): string =
         let years = name - x
         let fullName = y & age
         $yEARs & fuLLNamE
+      
+      hELLOWORLD(name = 1, age = "how old am I?")
