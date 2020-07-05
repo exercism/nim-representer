@@ -58,7 +58,7 @@ proc normalizeIdentDef(def: NimNode, map: var IdentMap): NimNode =
   if default.kind notin nnkLiterals:
     default = default.normalizeValue(map)
   # TODO: generic parameters
-  newIdentDefs(name, defType, default)
+  result = newIdentDefs(name, defType, default)
 
 proc normalizeRoutineDef(routineDef: NimNode, map: var IdentMap): NimNode =
   ## RoutineDef Tree:
@@ -80,7 +80,7 @@ proc normalizeRoutineDef(routineDef: NimNode, map: var IdentMap): NimNode =
   let formalParams = routineDef[3]
   let returnType = formalParams[0]
   let identDefs = formalParams[1..^1].mapIt(it.normalizeIdentDef(map))
-  routineDef.kind.newTree(
+  result = routineDef.kind.newTree(
     routineDef[0].addNewName(map), # RoutineDef Name
     newEmptyNode(), # Term Rewriting macros and templates which are not supported
     newEmptyNode(), # TODO: Implement Generic Params
@@ -103,10 +103,10 @@ proc normalizeImportExport(importStmt: NimNode, map: IdentMap): NimNode =
 
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
   code.expectKind nnkStmtList
-  var normalizedTree = nnkStmtList.newTree
+  result = nnkStmtList.newTree
 
   for index, statement in code:
-    normalizedTree.add case statement.kind:
+    result.add case statement.kind:
     of nnkCommentStmt: continue
     of nnkVarSection..nnkConstSection:
       var newDefSection = statement.kind.newTree()
@@ -125,13 +125,10 @@ proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
       nnkDiscardStmt.newNimNode.add statement[0].normalizeValue(map)
     else:
       statement
-
-  normalizedTree
-
 proc createRepresentation*(fileName: string): (NimNode, IdentMap) =
   var map: IdentMap
   let code = parseStmt fileName.staticRead
-  (code.normalizeStmtList(map), map)
+  result = (code.normalizeStmtList(map), map)
 
 when isMainModule:
   import json
