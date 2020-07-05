@@ -5,10 +5,10 @@ type
   NormalizedIdent* = distinct string
   IdentMap* = OrderedTable[NormalizedIdent, string]
 
-proc `[]`[I: Ordinal | BackwardsIndex](s: NormalizedIdent, i: I): char = s.string[i]
-proc `[]`[T: Ordinal, U: Ordinal](s: NormalizedIdent, x: HSlice[T, U]): string = s.string[x]
+proc `[]`[I: Ordinal | BackwardsIndex](s: NormalizedIdent, i: I): char {.inline.} = s.string[i]
+proc `[]`[T: Ordinal, U: Ordinal](s: NormalizedIdent, x: HSlice[T, U]): string {.inline.} = s.string[x]
 
-proc hash*(x: NormalizedIdent): Hash {.used.} =
+proc hash*(x: NormalizedIdent): Hash =
   !$(x[0].hash !& x[1..^1].hashIgnoreStyle)
 
 proc `==`*(a, b: NormalizedIdent): bool =
