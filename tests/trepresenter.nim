@@ -12,7 +12,7 @@ macro setup(test, code: untyped): untyped =
     )
   ))
 
-  let tableInit = 
+  let tableInit =
     if tableConstr.len != 0:
       newDotExpr(
         tableConstr,
@@ -52,7 +52,7 @@ suite "End to end":
       let x = 1
 
   test "All features":
-    
+
     setup(map.len == 11):
       type
         Dollar = distinct int
@@ -68,10 +68,10 @@ suite "End to end":
 
       var
         dollar: Dollar
-      
+
       const
         euro = 100.Dollar
-      
+
       testProc(name = $x, hello = y)
       testproC x
 
@@ -104,5 +104,5 @@ placeholder_4(placeholder_2 = 1, placeholder_3 = "how old am I?")"""
         let years = name - x
         let fullName = y & age
         $yEARs & fuLLNamE
-      
+
       hELLOWORLD(name = 1, age = "how old am I?")

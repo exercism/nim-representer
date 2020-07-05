@@ -6,20 +6,20 @@ suite "Identifier map testing":
   setup:
     var map: IdentMap
 
-  test "testInitialization":
+  test "Initialization":
     check map.len == 0
 
-  test "insertIdentifier":  
+  test "Insert Identifier":
     map["x".NormalizedIdent] = "placeholder_1"
     map["y".NormalizedIdent] = "placeholder_2"
     check map.len == 2
 
-  test "firstLetterCapital":
+  test "First Letter Capital":
     map["x".NormalizedIdent] = "placeholder_0"
     map["X".NormalizedIdent] = "placeholder_1"
     check map.len == 2
 
-  test "otherLetterCapitals":
+  test "Other Letter Capitals":
     map["hello".NormalizedIdent] = "placeholder_1"
     map["hElLO".NormalizedIdent] = "placeholder_100"
     map["Hello".NormalizedIdent] = "placeholder_2"
