@@ -77,9 +77,11 @@ suite "End to end":
 
       macro testMacro(code: untyped): untyped = discard
       template testTemplate(code: untyped): untyped = discard
+
   test "No params, return type or statements":
     setup(tree.strip == "proc placeholder_0*() =\n  discard".strip):
       proc helloWorld* = discard
+
   test "All the things":
     const expected = """import
   algorithm, macros as m, strutils
