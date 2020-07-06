@@ -89,12 +89,18 @@ suite "End to end":
 let
   placeholder_0 = 1
   placeholder_1 = `$`(placeholder_0).strip.replace("\n", `$`(placeholder_0))
-proc placeholder_4*(placeholder_2: int; placeholder_3: string): string =
-  let placeholder_5 = `-`(placeholder_2, placeholder_0)
-  let placeholder_6 = `&`(placeholder_1, placeholder_3)
-  `&`(`$`(placeholder_5), placeholder_6)
+proc placeholder_2*() =
+  echo("testing stdout")
 
-placeholder_4(placeholder_2 = 1, placeholder_3 = "how old am I?")"""
+placeholder_2()
+proc placeholder_5*(placeholder_3: int; placeholder_4 = "seventeen"): string =
+  let placeholder_6 = `-`(placeholder_3, placeholder_0)
+  let placeholder_7 = `&`(placeholder_1, placeholder_4)
+  let placeholder_8 = `&`(`$`(placeholder_6), placeholder_7)
+  placeholder_8
+
+echo(placeholder_0.placeholder_5)
+echo(placeholder_5(placeholder_3 = 1, placeholder_4 = "how old am I?"))"""
     setup(tree.strip == expected.strip):
       import strutils, algorithm, macros as m
 
@@ -102,9 +108,17 @@ placeholder_4(placeholder_2 = 1, placeholder_3 = "how old am I?")"""
         x = 1
         y = ($x).strip.replace("\n", $x)
 
-      proc helloWorld*(name: int, age: string): string =
+      proc testStdout*() =
+        echo "testing stdout"
+
+      testStdout()
+
+      proc helloWorld*(name: int, age = "seventeen"): string =
         let years = name - x
         let fullName = y & age
-        $yEARs & fuLLNamE
+        let id = $yEARs & fuLLNamE
+        id
 
-      hELLOWORLD(name = 1, age = "how old am I?")
+      echo x.helloWorld
+
+      echo hELLOWORLD(name = 1, age = "how old am I?")
