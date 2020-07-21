@@ -1,4 +1,4 @@
-import representer
+import representer/[mapping, normalizations]
 import macros, sequtils, strutils, unittest
 
 
