@@ -15,6 +15,7 @@ proc `==`*(a, b: NormalizedIdent): bool =
   a[0] == b[0] and cmpIgnoreStyle(a.string, b.string) == 0
 
 proc `$`*(ident: NormalizedIdent): string {.borrow, inline.}
+proc `%`*(ident: NormalizedIdent): JsonNode {.borrow.}
 proc `%`*(table: IdentMap): JsonNode =
   result = newJObject()
   for k, v in table:
