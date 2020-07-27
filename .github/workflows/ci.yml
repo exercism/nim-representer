@@ -1,0 +1,20 @@
+name: CI
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+
+jobs:
+  job1:
+    name: Nim Tests
+    runs-on: ubuntu-18.04
+    container: nimlang/nim:1.2.4-ubuntu-regular@sha256:02a555518a05c354ccb2627940f6138fca1090d198e5a0eb60936c03a4875c69
+
+    steps:
+    - uses: actions/checkout@aabbfeb2ce60b5bd82389903509092c4648a9713 # v2.2.0
+
+    - name: Compile and run `tests/*`
+      run: "nimble test"
