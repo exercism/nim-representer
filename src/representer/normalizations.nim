@@ -147,9 +147,9 @@ proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
       statement.normalizeCall(map)
     of nnkImportStmt, nnkFromStmt, nnkImportExceptStmt:
       statement.normalizeImportExport(map)
-    of nnkDiscardStmt:
-      nnkDiscardStmt.newNimNode.add statement[0].normalizeValue(map)
     of nnkIdent, nnkDotExpr:
       statement.normalizeValue(map)
+    of nnkBreakStmt, nnkDiscardStmt, nnkReturnStmt, nnkYieldStmt: # TODO: mixin and bind statements
+      statement.kind.newNimNode.add statement[0].normalizeValue(map)
     else:
       statement
