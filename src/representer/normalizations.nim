@@ -24,16 +24,38 @@ proc normalizeEqExpr(eqExpr: NimNode, map: var IdentMap): NimNode =
   eqExpr.expectKind nnkExprEqExpr
   nnkExprEqExpr.newTree(eqExpr[0].normalizeValue(map), eqExpr[1].normalizeValue(map))
 
+proc constructFmtStr(ast: NimNode, map: var IdentMap): string =
+  with result:
+    add "{"
+    add ast[2].normalizeValue(map).repr
+    add if ($ast[3]).len != 0: ":" & $ast[3] else: ""
+    add "}"
+
+
 proc normalizeCall(call: NimNode, map: var IdentMap): NimNode =
-  result = newCall(
-    call[0].normalizeValue(map),
-  )
-  for param in call[1..^1]:
-    result.add case param.kind:
-      of nnkExprEqExpr:
-        nnkExprEqExpr.newTree(param[0].normalizeValue(map), param[1].normalizeValue(map))
-      else:
-        param.normalizeValue(map)
+  result =
+    if call.kind != nnkInfix and (call[0] == "fmt".ident or call[0] == "&".ident):
+      let fmtAst = getAst(fmt(call[1]))
+      let strToFmt = fmtAst[1..^2].mapIt(
+        if $it[0][0] == "add":
+          $it[2]
+        else:
+          constructFmtStr it, map
+      ).join
+
+      nnkCallStrLit.newTree(
+        "fmt".ident,
+        newLit strToFmt
+      )
+
+    else:
+      newCall(call[0].normalizeValue(map), call[1..^1].mapIt(
+        if it.kind == nnkExprEqExpr:
+          it.normalizeEqExpr(map)
+        else:
+          it.normalizeValue(map))
+      )
+
 
 proc normalizeValue(value: NimNode, map: var IdentMap): NimNode =
   case value.kind:
