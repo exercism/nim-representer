@@ -142,3 +142,23 @@ proc placeholder_1*(placeholder_0 = "you"): string =
 
       proc twoFer*(name = "you"): string =
         &"One for {name}, one for me."
+
+suite "Test specific functionality":
+  let expected = """import
+  strformat
+
+proc placeholder_1*(placeholder_0 = "you"): string =
+  fmt"One for {placeholder_0}, one for me.""""
+  test "fmt strings":
+    setup(tree.strip == expected.strip):
+      import strformat
+
+      proc twoFer*(name = "you"): string =
+        fmt"One for {name}, one for me."
+
+  test "fmt string with `&`":
+    setup(tree.strip == expected.strip):
+      import strformat
+
+      proc twoFer*(name = "you"): string =
+        &"One for {name}, one for me."
