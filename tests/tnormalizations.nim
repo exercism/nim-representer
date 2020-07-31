@@ -122,3 +122,23 @@ echo(placeholder_5(placeholder_3 = 1, placeholder_4 = "how old am I?"))"""
       echo x.helloWorld
 
       echo hELLOWORLD(name = 1, age = "how old am I?")
+
+suite "Test specific functionality":
+  let expected = """import
+  strformat
+
+proc placeholder_1*(placeholder_0 = "you"): string =
+  fmt"One for {placeholder_0}, one for me.""""
+  test "fmt strings":
+    setup(tree.strip == expected.strip):
+      import strformat
+
+      proc twoFer*(name = "you"): string =
+        fmt"One for {name}, one for me."
+
+  test "fmt string with `&`":
+    setup(tree.strip == expected.strip):
+      import strformat
+
+      proc twoFer*(name = "you"): string =
+        &"One for {name}, one for me."
