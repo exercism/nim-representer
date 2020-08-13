@@ -62,8 +62,8 @@ proc normalizeConditionalBranch(branch: NimNode, map: var IdentMap): NimNode =
     result.add branch[0].normalizeValue(map)
   result.add branch[^1].normalizeStmtList(map)
 
-proc normalizeIf(ifStmt: NimNode, map: var IdentMap): NimNode =
-  ifStmt.expectKind {nnkIfExpr, nnkIfStmt}
+proc normalizeCond(ifStmt: NimNode, map: var IdentMap): NimNode =
+  ifStmt.expectKind {nnkIfExpr, nnkIfStmt, nnkWhenStmt}
   result = ifStmt.kind.newTree(
     ifStmt.mapIt(it.normalizeConditionalBranch(map))
   )
@@ -93,7 +93,7 @@ proc normalizeValue(value: NimNode, map: var IdentMap): NimNode =
   of nnkStmtList: value.normalizeStmtList(map)
   of nnkDotExpr: newDotExpr(value[0].normalizeValue(map), value[1].normalizeValue(map))
   of nnkPar: value[0].normalizeValue(map)
-  of nnkIfExpr: value.normalizeIf(map)
+  of nnkIfExpr, nnkWhenStmt: value.normalizeCond(map)
   of nnkCaseStmt: value.normalizeCase(map)
   else:
     error "dont know how to normalize " & value.repr & " with type: " &
@@ -180,8 +180,8 @@ proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
       statement.normalizeValue(map)
     of nnkBreakStmt, nnkDiscardStmt, nnkReturnStmt, nnkYieldStmt: # TODO: mixin and bind statements
       statement.kind.newNimNode.add statement[0].normalizeValue(map)
-    of nnkIfStmt, nnkIfExpr:
-      statement.normalizeIf(map)
+    of nnkIfStmt, nnkIfExpr, nnkWhenStmt:
+      statement.normalizeCond(map)
     of nnkCaseStmt:
       statement.normalizeCase(map)
     else:
