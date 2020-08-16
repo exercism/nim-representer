@@ -84,6 +84,14 @@ proc normalizeCase(caseStmt: NimNode, map: var IdentMap): NimNode =
     caseStmt[0].normalizeValue(map)
   ).add caseStmt[1..^1].mapIt(it.normalizeCaseBranch(map))
 
+proc normalizeBlock(blockStmt: NimNode, map: var IdentMap): NimNode =
+  blockStmt.expectKind {nnkBlockStmt, nnkBlockExpr}
+
+  result = blockStmt.kind.newTree(
+    blockStmt[0].normalizeDefName(map),
+    blockStmt.normalizeStmtList(map)
+  )
+
 proc normalizeValue(value: NimNode, map: var IdentMap): NimNode =
   case value.kind:
   of nnkLiterals: value
@@ -194,5 +202,7 @@ proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
       statement.normalizeCase(map)
     of nnkWhileStmt, nnkForStmt:
       statement.normalizeLoop(map)
+    of nnkBlockStmt, nnkBlockExpr:
+      statement.normalizeBlock(map)
     else:
       statement
