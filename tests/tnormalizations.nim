@@ -2,7 +2,7 @@ import representer/[mapping, normalizations]
 import macros, sequtils, strutils, unittest
 
 
-macro setup(test, code: untyped): untyped =
+macro setup(test: untyped, code: untyped): untyped =
   var map: IdentMap
   let tree = code.normalizeStmtList(map)
   let tableConstr = nnkTableConstr.newTree.add(toSeq(map.pairs).mapIt(
@@ -73,7 +73,7 @@ suite "End to end":
         euro = 100.Dollar
 
       testProc(name = $x, hello = y)
-      testproC x
+      testproC $y, x
 
       macro testMacro(code: untyped): untyped = discard
       template testTemplate(code: untyped): untyped = discard
@@ -124,21 +124,104 @@ echo(placeholder_5(placeholder_3 = 1, placeholder_4 = "how old am I?"))"""
       echo hELLOWORLD(name = 1, age = "how old am I?")
 
 suite "Test specific functionality":
-  let expected = """import
+  let fmtTestsExpected = """import
   strformat
 
 proc placeholder_1*(placeholder_0 = "you"): string =
   fmt"One for {placeholder_0}, one for me.""""
   test "fmt strings":
-    setup(tree.strip == expected.strip):
+    setup(tree.strip == fmtTestsExpected.strip):
       import strformat
 
       proc twoFer*(name = "you"): string =
         fmt"One for {name}, one for me."
 
   test "fmt string with `&`":
-    setup(tree.strip == expected.strip):
+    setup(tree.strip == fmtTestsExpected.strip):
       import strformat
 
       proc twoFer*(name = "you"): string =
         &"One for {name}, one for me."
+  test "case statement":
+    const expected = """let placeholder_0 = 1
+let placeholder_1 = 1
+var placeholder_2 = case placeholder_0
+of `..`(`-`(100), 1), 2:
+  "first option"
+of `..`(3, 100):
+  const
+    placeholder_1 = "hello"
+  echo(placeholder_1, "second option")
+  "second option"
+elif `==`(placeholder_1, 4):
+  `&`("main".substr(2, "main".high), `$`(4))
+else:
+  "I guess I\'m the last one""""
+    setup(tree.strip == expected.strip):
+      let a = 1
+      let x = 1
+      var b = case a:
+        of -100..1, 2:
+          "first option"
+        of 3..100:
+          const x = "hello"
+          echo x, "second option"
+          "second option"
+        elif x == 4:
+          "main".substr(2, "main".high) & $4
+        else:
+          "I guess I'm the last one"
+
+  test "if statment & expression":
+    const expected = """import
+  time
+
+let placeholder_0 = if `>`(now().second, 30):
+  1 else:
+  2
+if `>`(placeholder_0, 1):
+  echo("ehhlo")
+  let placeholder_1 = 1
+else:
+  let placeholder_2 = 2
+  stderr.writeLine("Hello!!")"""
+    setup(tree.strip == expected.strip):
+      import time
+      let x =
+        if now().second > 30:
+          1
+        else:
+          2
+      if x > 1:
+        echo "ehhlo"
+        let y = 1
+      else:
+        let z = 2
+        stderr.writeLine "Hello!!"
+  test "single value stmts":
+    let expeceted = """"""
+    setup(tree.strip == expected.strip):
+      let months = @[
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ]
+
+      proc isSummer*(month: string): bool =
+        return month in ["June", "July", "August"]
+
+      iterator summerMonths*: string =
+        for month in months:
+          if month.isSummer():
+            yield month
+
+      let n = now()
