@@ -10,16 +10,17 @@ proc createRepresentation*(fileName: string): tuple[tree: NimNode, map: IdentMap
   result = (tree: code.normalizeStmtList(map), map: map)
 
 
-const dir {.strdefine.} = ""
+const inDir {.strdefine.} = ""
+const outDir {.strdefine.} = ""
 const slug {.strdefine.} = ""
 const underSlug = slug.replace('-', '_')
 
 when isMainModule:
   import json
   static:
-    let (tree, map) = createRepresentation(dir / underSlug & ".nim")
+    let (tree, map) = createRepresentation(inDdir / underSlug & ".nim")
     let finalMapping = map.switchKeysValues
     echo (%*{"map": finalMapping, "tree": tree.repr}).pretty
     when defined(dir):
-      writeFile(dir / "representation.txt", tree.repr)
-      writeFile(dir / "mapping.json", $(%finalMapping))
+      writeFile(outDir / "representation.txt", tree.repr)
+      writeFile(outDdir / "mapping.json", $(%finalMapping))

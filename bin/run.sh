@@ -1,6 +1,6 @@
 set -e
 
-if [ -z "$1" ] || [ -z "$2" ]; then
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
     echo "slug and solution directory must be present"
     exit 1
 fi
