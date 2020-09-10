@@ -123,6 +123,8 @@ proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
       statement.normalizeImportExport(map)
     of nnkDiscardStmt:
       nnkDiscardStmt.newNimNode.add statement[0].normalizeValue(map)
+    of nnkIdent, nnkDotExpr:
+      statement.normalizeValue(map)
     else:
       statement
 proc createRepresentation*(fileName: string): (NimNode, IdentMap) =
