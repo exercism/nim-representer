@@ -2,10 +2,10 @@ name: CI
 on:
   push:
     paths-ignore:
-      - '**.md'
+      - "**.md"
   pull_request:
     paths-ignore:
-      - '**.md'
+      - "**.md"
 
 jobs:
   job1:
@@ -14,7 +14,22 @@ jobs:
     container: nimlang/nim:1.2.4-ubuntu-regular@sha256:02a555518a05c354ccb2627940f6138fca1090d198e5a0eb60936c03a4875c69
 
     steps:
-    - uses: actions/checkout@28c7f3d2b5162b5ddd3dfd9a45aa55eaf396478b # v2.3.1
+      - uses: actions/checkout@28c7f3d2b5162b5ddd3dfd9a45aa55eaf396478b # v2.3.1
 
-    - name: Compile and run tests with `nimble test`
-      run: "nimble test"
+      - name: Compile and run tests with `nimble test`
+        run: "nimble test"
+  job2:
+    name: Smoke test
+    runs-on: ubuntu-18.04
+    container: nimlang/nim:1.2.4-ubuntu-regular@sha256:02a555518a05c354ccb2627940f6138fca1090d198e5a0eb60936c03a4875c69
+
+    steps:
+      - uses: actions/checkout@28c7f3d2b5162b5ddd3dfd9a45aa55eaf396478b
+
+      - name: "Make representation of `two-fer`"
+        run: "bin/run.sh two-fer ${PWD}/tests/cases/example-two-fer/ ${PWD}/tests/cases/example-two-fer/"
+
+      - name: "Check diffs"
+        run: |
+          diff tests/cases/example-two-fer/mapping.json tests/cases/example-two-fer/expected/mapping.json
+          diff tests/cases/example-two-fer/representation.txt tests/cases/example-two-fer/expected/representation.txt
