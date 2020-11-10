@@ -18,9 +18,9 @@ const underSlug = slug.replace('-', '_')
 when isMainModule:
   import json
   static:
-    let (tree, map) = createRepresentation(inDdir / underSlug & ".nim")
+    let (tree, map) = createRepresentation(inDir / underSlug & ".nim")
     let finalMapping = map.switchKeysValues
     echo (%*{"map": finalMapping, "tree": tree.repr}).pretty
-    when defined(dir):
+    when defined(outDir):
       writeFile(outDir / "representation.txt", tree.repr)
-      writeFile(outDdir / "mapping.json", $(%finalMapping))
+      writeFile(outDir / "mapping.json", $(%finalMapping))
