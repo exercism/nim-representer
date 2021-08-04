@@ -67,8 +67,9 @@ proc normalizeValue(value: NimNode, map: var IdentMap): NimNode =
   of nnkDotExpr: newDotExpr(value[0].normalizeValue(map), value[1].normalizeValue(map))
   of nnkPar: value[0].normalizeValue(map)
   else:
-    raise newException(ValueError, "dont know how to normalize " & value.repr & " with type: " &
-        $value.kind & " as a value")
+    error "dont know how to normalize " & value.repr & " with type: " &
+        $value.kind & " as a value"
+    newEmptyNode()
 
 
 proc normalizeIdentDef(def: NimNode, map: var IdentMap): NimNode =
@@ -123,7 +124,8 @@ proc normalizeImportExport(importStmt: NimNode, map: IdentMap): NimNode =
   of nnkImportStmt, nnkExportStmt:
     importStmt.kind.newTree(importStmt[0..^1].sortedByIt(if it.kind == nnkInfix: it.unpackInfix.left.strVal else: it.strVal)) # TODO: implemement normalizations of `import macros as m`
   else:
-    raise newException(ValueError, $importStmt & "is not a valid import or export stmt")
+    error $importStmt & "is not a valid import or export stmt"
+    newEmptyNode()
 
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode =
   code.expectKind nnkStmtList
