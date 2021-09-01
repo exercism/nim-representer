@@ -10,4 +10,4 @@ binDir        = "bin"
 
 # Dependencies
 
-requires "nim >= 1.6.0"
+requires "nim >= 1.6.0", "macroutils == 1.2.0"

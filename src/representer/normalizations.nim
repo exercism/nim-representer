@@ -1,5 +1,7 @@
 ## Create an normalized AST of a submission on exercism.io to provide feedback
-import algorithm, macros, strformat, sequtils, strutils, std/with
+import std/[algorithm, strformat, sequtils, strutils, with]
+import std/macros except name
+import pkg/macroutils
 import mapping
 
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode
