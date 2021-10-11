@@ -1,7 +1,6 @@
 ## Create an normalized AST of a submission on exercism.io to provide feedback
-import std/[algorithm, strformat, sequtils, strutils, with]
-import std/macros except name
-import pkg/macroutils
+import algorithm, macros, strformat, sequtils, strutils, std/with
+from macroutils import retval, FormalParams
 import mapping
 
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode
@@ -104,20 +103,12 @@ proc normalizeRoutineDef(routineDef: NimNode, map: var IdentMap): NimNode =
   ##   Pragmas
   ##   Empty
   ##   StmtList # meat and potatoes
-  let formalParams = routineDef[3]
-  let returnType = formalParams[0]
+  let formalParams = params routineDef
+  let returnType = retval formalParams
   let identDefs = formalParams[1..^1].mapIt(it.normalizeIdentDef(map))
-  result = routineDef.kind.newTree(
-    routineDef[0].addNewName(map), # RoutineDef Name
-    newEmptyNode(), # Term Rewriting macros and templates which are not supported
-    newEmptyNode(), # TODO: Implement Generic Params
-    nnkFormalParams.newTree(
-      returnType.normalizeValue(map)
-    ).add(identDefs),
-    newEmptyNode(), # TODO: Implement pragma
-    newEmptyNode(), # Empty, open for future use
-    routineDef.last.normalizeStmtList(map)
-  )
+  result = routineDef.copy
+  result.name = routineDef.name.addNewName(map)
+  result.params = FormalParams(retval = returnType.normalizeValue(map), arguments = identDefs)
 
 proc normalizeImportExport(importStmt: NimNode, map: IdentMap): NimNode =
   case importStmt.kind:
