@@ -1,7 +1,7 @@
 # Package
 
 version       = "0.1.0"
-author        = "Yoni Fihrer"
+author        = "@exercism/nim"
 description   = "A representer to normalize a submission on the `nim` track of exercism.io"
 license       = "MIT"
 srcDir        = "src"
@@ -10,4 +10,4 @@ binDir        = "bin"
 
 # Dependencies
 
-requires "nim >= 1.0.0"
+requires "nim >= 1.6.0"
