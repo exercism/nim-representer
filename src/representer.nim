@@ -6,20 +6,22 @@ proc switchKeysValues*(map: IdentMap): OrderedTable[string, NormalizedIdent] =
 
 proc createRepresentation*(fileName: string): tuple[tree: NimNode, map: IdentMap] =
   var map: IdentMap
-  let code = parseStmt fileName.staticRead
+  let code = parseStmt staticRead fileName
   result = (tree: code.normalizeStmtList(map), map: map)
 
 
-const inDir {.strdefine.} = ""
-const outDir {.strdefine.} = ""
-const slug {.strdefine.} = ""
-const underSlug = slug.replace('-', '_')
+const
+  inDir {.strdefine.} = "/Users/ynf/Exercism/nim/hello-world/"
+  outDir {.strdefine.} = ""
+  slug {.strdefine.} = "hello-world"
+  underSlug = slug.replace('-', '_')
 
 when isMainModule:
   import json
   static:
-    let (tree, map) = createRepresentation(inDir / underSlug & ".nim")
-    let finalMapping = map.switchKeysValues
+    let
+      (tree, map) = createRepresentation(inDir / underSlug & ".nim")
+      finalMapping = map.switchKeysValues
     echo (%*{"map": finalMapping, "tree": tree.repr}).pretty
     when defined(outDir):
       writeFile(outDir / "representation.txt", tree.repr)

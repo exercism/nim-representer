@@ -1,50 +1,36 @@
+import std/[macros, sequtils, strutils, unittest]
 import representer/[mapping, normalizations]
-import macros, sequtils, strutils, unittest
-
+import macroutils
 
 macro setup(test, code: untyped): untyped =
   var map: IdentMap
-  let tree = code.normalizeStmtList(map)
-  let tableConstr = nnkTableConstr.newTree.add(toSeq(map.pairs).mapIt(
-    nnkExprColonExpr.newTree(
-        newDotExpr(it[0].string.newStrLitNode, "NormalizedIdent".ident),
-        it[1].newStrLitNode
+  let
+    tree = code.normalizeStmtList(map)
+    tableConstr  = TableConstr(map.pairs.toSeq.map do (x: (NormalizedIdent, string)) -> auto:
+      ExprColonExpr(
+        DotExpr(
+          Lit string x[0],
+          Ident "NormalizedIdent"
+        ),
+        Lit x[1]
+      )
     )
-  ))
+    tableInit =
+      if tableConstr.len != 0:
+        newDotExpr(
+          tableConstr,
+          "toOrderedTable".ident
+        )
+      else:
+        newEmptyNode()
+  let
+    treeIdent = ident "tree"
+    mapIdent = ident "map"
 
-  let tableInit =
-    if tableConstr.len != 0:
-      newDotExpr(
-        tableConstr,
-        "toOrderedTable".ident
-      )
-    else:
-      newEmptyNode()
-
-  newStmtList(
-    nnkLetSection.newTree(
-      nnkIdentDefs.newTree(
-        nnkPragmaExpr.newTree(
-          ident "tree",
-          nnkPragma.newTree(ident "used")
-        ),
-        newEmptyNode(),
-        newLit tree.repr
-      ),
-    ),
-    nnkVarSection.newTree(
-      nnkIdentDefs.newTree(
-        nnkPragmaExpr.newTree(
-          ident "map",
-          nnkPragma.newTree(ident "used")
-        ),
-        "IdentMap".ident,
-        tableInit
-      )
-    ),
-
-    newCall("check", test)
-  )
+  result = superQuote do:
+    let `treeIdent` {.used.} = `repr(tree)`
+    var `mapIdent` {.used.} = `tableInit`
+    check(`test`)
 
 suite "End to end":
   test "Just one `let` statement":
