@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "Yoni Fihrer"
-description   = "A representer to normalize a submission on the `nim` track of exercism.io"
+description   = "A representer to normalize user-submitted code on the `nim` track of exercism.org"
 license       = "MIT"
 srcDir        = "src"
 bin           = @["representer"]

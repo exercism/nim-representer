@@ -1,4 +1,4 @@
-## Create an normalized AST of a submission on exercism.io to provide feedback
+## Create an normalized AST of a submission on exercism.org to provide feedback
 import algorithm, macros, strformat, sequtils, strutils, std/with
 import mapping
 
