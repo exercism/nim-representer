@@ -14,7 +14,7 @@ jobs:
     container: nimlang/nim:1.2.4-ubuntu-regular@sha256:02a555518a05c354ccb2627940f6138fca1090d198e5a0eb60936c03a4875c69
 
     steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # v2.4.0
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
       - name: Compile and run tests with `nimble test`
         run: "nimble test"
