@@ -1,26 +1,42 @@
-import macros, os, sequtils, strutils
-import representer/[mapping, normalizations]
+import std/[json, os, strformat, strutils]
+import nimscripter
+import representer/[mapping, types]
+import docopt
 
-proc switchKeysValues*(map: IdentMap): OrderedTable[string, NormalizedIdent] =
-  toSeq(map.pairs).mapIt((it[1], it[0])).toOrderedTable
+const doc = """
+Exercism nim representation normalizer.
 
-proc createRepresentation*(fileName: string): tuple[tree: NimNode, map: IdentMap] =
-  var map: IdentMap
-  let code = parseStmt fileName.staticRead
-  result = (tree: code.normalizeStmtList(map), map: map)
+Usage:
+  representer --slug=<slug> --input-dir=<in-dir> [--output-dir=<out-dir>] [--print]
 
+Options:
+  -h --help                             Show this help message.
+  -v, --version                         Display version.
+  -p, --print                           Print the results.
+  -s <slug>, --slug=<slug>              The exercise slug.
+  -i <in-dir>, --input-dir=<in-dir>     The directory of the submission and exercise files.
+  -o <out-dir>, --output-dir=<out-dir>  The directory to output to.
+                                        This is optional and will then output to stdout.
+"""
 
-const inDir {.strdefine.} = ""
-const outDir {.strdefine.} = ""
-const slug {.strdefine.} = ""
-const underSlug = slug.replace('-', '_')
+proc getFileContents*(fileName: string): string = readFile fileName
+
+func underSlug(s: string): string = s.replace('-', '_')
+
+proc main() =
+  let args = docopt(doc)
+  let intr = loadScript(NimScriptPath("src/representer/loader.nims"))
+  let (tree, map) = intr.invoke(
+    getTestableRepresentation,
+    getFileContents(&"""{args["--input-dir"]}/{($args["--slug"]).underSlug}.nim"""), true,
+    returnType = SerializedRepresentation
+  )
+  if args["--output-dir"]:
+    let outDir = $args["--output-dir"]
+    writeFile outDir / "mapping.json", $map.parseJson
+    writeFile outDir / "representation.txt", tree
+  if not args["--output-dir"] or args["--print"]:
+    echo &"{tree = }\n{map.parseJson.pretty = }"
 
 when isMainModule:
-  import json
-  static:
-    let (tree, map) = createRepresentation(inDir / underSlug & ".nim")
-    let finalMapping = map.switchKeysValues
-    echo (%*{"map": finalMapping, "tree": tree.repr}).pretty
-    when defined(outDir):
-      writeFile(outDir / "representation.txt", tree.repr)
-      writeFile(outDir / "mapping.json", $(%finalMapping))
+  main()

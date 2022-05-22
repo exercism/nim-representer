@@ -2,6 +2,8 @@
 import algorithm, macros, strformat, sequtils, strutils, std/with
 import mapping
 
+{.experimental: "strictFuncs".}
+
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode
 proc normalizeValue(value: NimNode, map: var IdentMap): NimNode
 
@@ -35,7 +37,7 @@ proc constructFmtStr(ast: NimNode, map: var IdentMap): string =
 proc normalizeCall(call: NimNode, map: var IdentMap): NimNode =
   result =
     if call.kind != nnkInfix and (call[0] == "fmt".ident or call[0] == "&".ident):
-      let fmtAst = getAst(fmt(call[1]))
+      let fmtAst = getAst(&(call[1]))
       let strToFmt = fmtAst[1..^2].mapIt(
         if $it[0][0] == "add":
           $it[2]

@@ -10,4 +10,4 @@ binDir        = "bin"
 
 # Dependencies
 
-requires "nim >= 1.0.0"
+requires "nim >= 1.0.0", "nimscripter == 1.0.14", "docopt == 0.6.8"
