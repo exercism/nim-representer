@@ -10,26 +10,57 @@ on:
 jobs:
   job1:
     name: Nim Tests
-    runs-on: ubuntu-18.04
-    container: nimlang/nim:1.2.4-ubuntu-regular@sha256:02a555518a05c354ccb2627940f6138fca1090d198e5a0eb60936c03a4875c69
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - uses: jiro4989/setup-nim-action@v1
+        with:
+          nim-version: '1.6.6'
+
+      - name: Cache nimble
+        id: cache-nimble
+        uses: actions/cache@v1
+        with:
+          path: ~/.nimble
+          key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
+        if: runner.os != 'Windows'
 
       - name: Compile and run tests with `nimble test`
-        run: "nimble test"
+        run: "nimble test -Y"
+
+
   job2:
     name: Smoke test
-    runs-on: ubuntu-18.04
-    container: nimlang/nim:1.2.4-ubuntu-regular@sha256:02a555518a05c354ccb2627940f6138fca1090d198e5a0eb60936c03a4875c69
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
+
+      - uses: jiro4989/setup-nim-action@v1
+        with:
+          nim-version: '1.6.6'
+
+      - name: Cache nimble
+        id: cache-nimble
+        uses: actions/cache@v1
+        with:
+          path: ~/.nimble
+          key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
+        if: runner.os != 'Windows'
+
+      - name: "Install nimble dependencies"
+        run: "nimble install -y -d"
+        if: steps.cache-nimble.outputs.cache-hit != 'true'
+
+      - name: "Compile representer"
+        run: "nimble c -d:release src/representer"
 
       - name: "Make representation of `two-fer`"
         run: "bin/run.sh two-fer ${PWD}/tests/cases/example-two-fer/ ${PWD}/tests/cases/example-two-fer/"
 
       - name: "Check diffs"
         run: |
-          diff tests/cases/example-two-fer/mapping.json tests/cases/example-two-fer/expected/mapping.json
-          diff tests/cases/example-two-fer/representation.txt tests/cases/example-two-fer/expected/representation.txt
+          diff -y tests/cases/example-two-fer/mapping.json tests/cases/example-two-fer/expected/mapping.json
+          diff -y tests/cases/example-two-fer/representation.txt tests/cases/example-two-fer/expected/representation.txt
