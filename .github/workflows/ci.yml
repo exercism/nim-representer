@@ -27,8 +27,7 @@ jobs:
           key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
 
       - name: Compile and run tests with `nimble test`
-        run: "nimble test -Y"
-
+        run: "nimble test -y"
 
   job2:
     name: Smoke test
