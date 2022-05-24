@@ -25,7 +25,6 @@ jobs:
         with:
           path: ~/.nimble
           key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
-        if: runner.os != 'Windows'
 
       - name: Compile and run tests with `nimble test`
         run: "nimble test -Y"
@@ -48,7 +47,6 @@ jobs:
         with:
           path: ~/.nimble
           key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
-        if: runner.os != 'Windows'
 
       - name: "Install nimble dependencies"
         run: "nimble install -y -d"
