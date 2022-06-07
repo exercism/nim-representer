@@ -19,7 +19,7 @@ Options:
                                         If omitted, output will be written to stdout.
 """
 
-proc getFileContents*(fileName: string): string = readFile fileName
+proc getFileContents(fileName: string): string = readFile fileName
 
 func underSlug(s: string): string = s.replace('-', '_')
 
