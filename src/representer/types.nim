@@ -1,4 +1,4 @@
-import std/[sequtils, tables]
+import std/[sugar, tables]
 import mapping
 
 type
@@ -10,5 +10,7 @@ type
     map: string
 
 proc switchKeysValues*(map: IdentMap): OrderedTable[string, NormalizedIdent] =
-  toSeq(map.pairs).mapIt((it[1], it[0])).toOrderedTable
+  result = collect(initOrderedTable):
+    for key, val in map.pairs:
+      {val: key}
 
