@@ -16,7 +16,7 @@ Options:
   -s <slug>, --slug=<slug>              The exercise slug.
   -i <in-dir>, --input-dir=<in-dir>     The directory of the submission and exercise files.
   -o <out-dir>, --output-dir=<out-dir>  The directory to output to.
-                                        This is optional and will then output to stdout.
+                                        If omitted, output will be written to stdout.
 """
 
 proc getFileContents*(fileName: string): string = readFile fileName
