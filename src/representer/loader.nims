@@ -11,4 +11,3 @@ proc createRepresentation(contents: string): tuple[tree: NimNode, map: IdentMap]
 proc getTestableRepresentation*(contents: string, switch = false): SerializedRepresentation =
   let (tree, map) = createRepresentation(contents)
   result = (repr tree, $(if switch: %map.switchKeysValues else: %map))
-

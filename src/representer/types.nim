@@ -13,4 +13,3 @@ proc switchKeysValues*(map: IdentMap): OrderedTable[string, NormalizedIdent] =
   result = collect(initOrderedTable):
     for key, val in map.pairs:
       {val: key}
-
