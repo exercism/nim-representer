@@ -3,9 +3,9 @@ import mapping
 import normalizations
 import types
 
-proc createRepresentation*(file: string): tuple[tree: NimNode, map: IdentMap] =
+proc createRepresentation(contents: string): tuple[tree: NimNode, map: IdentMap] =
   var map: IdentMap
-  let code = parseStmt(file)
+  let code = parseStmt(contents)
   result = (tree: code.normalizeStmtList(map), map: map)
 
 proc getTestableRepresentation*(contents: string, switch = false): SerializedRepresentation =
