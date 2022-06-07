@@ -28,7 +28,7 @@ proc main() =
   let intr = loadScript(NimScriptPath("src/representer/loader.nims"))
   let (tree, map) = intr.invoke(
     getTestableRepresentation,
-    getFileContents(&"""{args["--input-dir"]}/{($args["--slug"]).underSlug}.nim"""), true,
+    getFileContents($args["--input-dir"] / underslug($args["--slug"]) & ".nim"), true,
     returnType = SerializedRepresentation
   )
   if args["--output-dir"]:
