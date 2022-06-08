@@ -1,7 +1,5 @@
 import std/[json, macros]
-import mapping
-import normalizations
-import types
+import "."/[mapping, normalizations, types]
 
 proc createRepresentation(contents: string): tuple[tree: NimNode, map: IdentMap] =
   var map: IdentMap
