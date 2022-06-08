@@ -48,8 +48,8 @@ jobs:
           key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
 
       - name: "Install nimble dependencies"
-        run: "nimble install -y -d"
         if: steps.cache-nimble.outputs.cache-hit != 'true'
+        run: "nimble install -y -d"
 
       - name: "Compile representer"
         run: "nimble c -d:release src/representer"
