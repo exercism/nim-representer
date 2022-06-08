@@ -2,8 +2,6 @@
 import algorithm, macros, strformat, sequtils, strutils, std/with
 import mapping
 
-{.experimental: "strictFuncs".}
-
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode
 proc normalizeValue(value: NimNode, map: var IdentMap): NimNode
 
