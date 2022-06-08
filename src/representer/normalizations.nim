@@ -1,6 +1,6 @@
 ## Create an normalized AST of a submission on exercism.org to provide feedback
-import algorithm, macros, strformat, sequtils, strutils, std/with
-import mapping
+import std/[algorithm, macros, strformat, sequtils, strutils, with]
+import "."/mapping
 
 proc normalizeStmtList*(code: NimNode, map: var IdentMap): NimNode
 proc normalizeValue(value: NimNode, map: var IdentMap): NimNode
