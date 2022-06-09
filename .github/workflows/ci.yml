@@ -15,13 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
-      - uses: jiro4989/setup-nim-action@5efcb0ac6189962c61098fcbe9a0765c1d81467b
+      - uses: jiro4989/setup-nim-action@9a5a618a7cccbc7415b2a539f25c9681fafe0ddb
         with:
           nim-version: '1.6.6'
 
       - name: Cache nimble
         id: cache-nimble
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09
+        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d
         with:
           path: ~/.nimble
           key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
@@ -36,13 +36,13 @@ jobs:
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
-      - uses: jiro4989/setup-nim-action@5efcb0ac6189962c61098fcbe9a0765c1d81467b
+      - uses: jiro4989/setup-nim-action@9a5a618a7cccbc7415b2a539f25c9681fafe0ddb
         with:
           nim-version: '1.6.6'
 
       - name: Cache nimble
         id: cache-nimble
-        uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09
+        uses: actions/cache@c3f1317a9e7b1ef106c153ac8c0f00fed3ddbc0d
         with:
           path: ~/.nimble
           key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
