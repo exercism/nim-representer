@@ -124,4 +124,4 @@ suite "Test specific functionality":
       proc twoFer*(name = "you"): string =
         &"One for {name}, one for me." """
 
-    check expected == tree
+    check tree == expected
