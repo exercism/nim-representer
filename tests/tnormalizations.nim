@@ -1,59 +1,24 @@
-import representer/[mapping, normalizations]
-import macros, sequtils, strutils, unittest
+import std/[json, strutils, unittest]
+import nimscripter
+import representer/types
 
+let
+  intr = loadScript(NimScriptPath "src/representer/loader.nims")
 
-macro setup(test, code: untyped): untyped =
-  var map: IdentMap
-  let tree = code.normalizeStmtList(map)
-  let tableConstr = nnkTableConstr.newTree.add(toSeq(map.pairs).mapIt(
-    nnkExprColonExpr.newTree(
-        newDotExpr(it[0].string.newStrLitNode, "NormalizedIdent".ident),
-        it[1].newStrLitNode
-    )
-  ))
-
-  let tableInit =
-    if tableConstr.len != 0:
-      newDotExpr(
-        tableConstr,
-        "toOrderedTable".ident
-      )
-    else:
-      newEmptyNode()
-
-  newStmtList(
-    nnkLetSection.newTree(
-      nnkIdentDefs.newTree(
-        nnkPragmaExpr.newTree(
-          ident "tree",
-          nnkPragma.newTree(ident "used")
-        ),
-        newEmptyNode(),
-        newLit tree.repr
-      ),
-    ),
-    nnkVarSection.newTree(
-      nnkIdentDefs.newTree(
-        nnkPragmaExpr.newTree(
-          ident "map",
-          nnkPragma.newTree(ident "used")
-        ),
-        "IdentMap".ident,
-        tableInit
-      )
-    ),
-
-    newCall("check", test)
-  )
+proc getRepresentation(t: string): tuple[tree: string, map: JsonNode] =
+  let (tree, map) = intr.invoke(getTestableRepresentation, t, false, returnType = SerializedRepresentation)
+  result = (tree, map.parseJson)
 
 suite "End to end":
   test "Just one `let` statement":
-    setup(map["x".NormalizedIdent] == "placeholder_0" and map.len == 1):
-      let x = 1
+    let (_, map) = getRepresentation """let x = 1"""
+    check:
+      map["x"].getStr == "placeholder_0"
+      map.len == 1
 
   test "All features":
+    let (_, map) = getRepresentation dedent """
 
-    setup(map.len == 11):
       type
         Dollar = distinct int
 
@@ -77,31 +42,39 @@ suite "End to end":
 
       macro testMacro(code: untyped): untyped = discard
       template testTemplate(code: untyped): untyped = discard
+      """
+
+    check map.len == 11
 
   test "No params, return type or statements":
-    setup(tree.strip == "proc placeholder_0*() =\n  discard".strip):
-      proc helloWorld* = discard
+    let (tree, _) = getRepresentation """proc helloWorld* = discard"""
+
+    check tree == "\nproc placeholder_0*() =\n  discard\n"
 
   test "All the things":
-    const expected = """import
-  algorithm, macros as m, strutils
+    const expected = dedent """
 
-let
-  placeholder_0 = 1
-  placeholder_1 = `$`(placeholder_0).strip.replace("\n", `$`(placeholder_0))
-proc placeholder_2*() =
-  echo("testing stdout")
+      import
+        algorithm, macros as m, strutils
 
-placeholder_2()
-proc placeholder_5*(placeholder_3: int; placeholder_4 = "seventeen"): string =
-  let placeholder_6 = `-`(placeholder_3, placeholder_0)
-  let placeholder_7 = `&`(placeholder_1, placeholder_4)
-  let placeholder_8 = `&`(`$`(placeholder_6), placeholder_7)
-  placeholder_8
+      let
+        placeholder_0 = 1
+        placeholder_1 = `$`(placeholder_0).strip.replace("\n", `$`(placeholder_0))
+      proc placeholder_2*() =
+        echo("testing stdout")
 
-echo(placeholder_0.placeholder_5)
-echo(placeholder_5(placeholder_3 = 1, placeholder_4 = "how old am I?"))"""
-    setup(tree.strip == expected.strip):
+      placeholder_2()
+      proc placeholder_5*(placeholder_3: int; placeholder_4 = "seventeen"): string =
+        let placeholder_6 = `-`(placeholder_3, placeholder_0)
+        let placeholder_7 = `&`(placeholder_1, placeholder_4)
+        let placeholder_8 = `&`(`$`(placeholder_6), placeholder_7)
+        placeholder_8
+
+      echo(placeholder_0.placeholder_5)
+      echo(placeholder_5(placeholder_3 = 1, placeholder_4 = "how old am I?"))"""
+
+    let (tree, _) = getRepresentation dedent """
+
       import strutils, algorithm, macros as m
 
       let
@@ -121,24 +94,34 @@ echo(placeholder_5(placeholder_3 = 1, placeholder_4 = "how old am I?"))"""
 
       echo x.helloWorld
 
-      echo hELLOWORLD(name = 1, age = "how old am I?")
+      echo hELLOWORLD(name = 1, age = "how old am I?")"""
+
+    check tree == expected
 
 suite "Test specific functionality":
-  let expected = """import
-  strformat
+  const expected = dedent """
 
-proc placeholder_1*(placeholder_0 = "you"): string =
-  fmt"One for {placeholder_0}, one for me.""""
+    import
+      strformat
+
+    proc placeholder_1*(placeholder_0 = "you"): string =
+      fmt"One for {placeholder_0}, one for me."
+    """
+
   test "fmt strings":
-    setup(tree.strip == expected.strip):
+    let (tree, _) = getRepresentation dedent """
       import strformat
 
       proc twoFer*(name = "you"): string =
-        fmt"One for {name}, one for me."
+        fmt"One for {name}, one for me." """
+
+    check tree == expected
 
   test "fmt string with `&`":
-    setup(tree.strip == expected.strip):
+    let (tree, _) = getRepresentation dedent """
       import strformat
 
       proc twoFer*(name = "you"): string =
-        &"One for {name}, one for me."
+        &"One for {name}, one for me." """
+
+    check tree == expected
