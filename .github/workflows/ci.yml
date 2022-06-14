@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
-      - uses: jiro4989/setup-nim-action@9a5a618a7cccbc7415b2a539f25c9681fafe0ddb
+      - uses: jiro4989/setup-nim-action@9ec0bcc235f8ad41abf1c2efaa827a87d48422fe
         with:
           nim-version: '1.6.6'
 
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
-      - uses: jiro4989/setup-nim-action@9a5a618a7cccbc7415b2a539f25c9681fafe0ddb
+      - uses: jiro4989/setup-nim-action@9ec0bcc235f8ad41abf1c2efaa827a87d48422fe
         with:
           nim-version: '1.6.6'
 
