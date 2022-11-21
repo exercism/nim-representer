@@ -15,16 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
-      - uses: jiro4989/setup-nim-action@d1ffcd5c196ab456acaa41bdea1f873d41a2294a
-        with:
-          nim-version: '1.6.6'
-
       - name: Cache nimble
         id: cache-nimble
         uses: actions/cache@0865c47f36e68161719c5b124609996bb5c40129
         with:
           path: ~/.nimble
           key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
+
+      - uses: jiro4989/setup-nim-action@d1ffcd5c196ab456acaa41bdea1f873d41a2294a
+        with:
+          nim-version: '1.6.6'
 
       - name: Compile and run tests with `nimble test`
         run: "nimble test -y"
