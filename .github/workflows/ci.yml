@@ -22,7 +22,7 @@ jobs:
           path: ~/.nimble
           key: ${{ runner.os }}-nimble-${{ hashFiles('*.nimble') }}
 
-      - uses: jiro4989/setup-nim-action@abce9961ad85b731aa961637dc00b55cd12a0c5a
+      - uses: jiro4989/setup-nim-action@030797be01d61b40866d69d9bcb4e8613d78948d
         with:
           nim-version: '1.6.6'
 
@@ -36,7 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c
 
-      - uses: jiro4989/setup-nim-action@abce9961ad85b731aa961637dc00b55cd12a0c5a
+      - uses: jiro4989/setup-nim-action@030797be01d61b40866d69d9bcb4e8613d78948d
         with:
           nim-version: '1.6.6'
 
