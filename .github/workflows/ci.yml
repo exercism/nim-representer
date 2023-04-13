@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+      - uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247
 
       - name: Cache nimble
         id: cache-nimble
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+      - uses: actions/checkout@83b7061638ee4956cf7545a6f7efe594e5ad0247
 
       - uses: jiro4989/setup-nim-action@7867b7bd430d6f91e7ee54a70bd60e614b5b6c12
         with:
