@@ -12,4 +12,3 @@ binDir        = "bin"
 
 requires "nim >= 1.6.6"
 requires "nimscripter == 1.0.16"
-requires "docopt == 0.6.8"
